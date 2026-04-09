@@ -1,0 +1,5 @@
+/target
+/engines/
+/models/
+/.fastembed_cache/
+*.log
