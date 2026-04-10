@@ -674,6 +674,14 @@ async fn api_chat(
     let history = req.history.unwrap_or_default();
     match s.chatbot.chat(history, &req.message).await {
         Ok(resp) => Json(resp).into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => {
+            if !s.engine.is_running() {
+                (StatusCode::SERVICE_UNAVAILABLE,
+                 "LLM engine stopped unexpectedly. Restart it from Engine Setup and check the engine log.")
+                    .into_response()
+            } else {
+                (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response()
+            }
+        }
     }
 }
