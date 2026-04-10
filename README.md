@@ -4,12 +4,11 @@ PYXIS-MCP is a nano, demo prototype for warehouse Digital Twin & Chatbot, built 
 
 It bridges a local LLM (Gemma 4 via llama-server) with a warehouse management system through the Model Context Protocol (MCP). 
 
-Data is sourced from both static data (like bins, SKU information) and dynamic data gathered through API (mock) calls (in
+Data is sourced from both static data (like bins, SKU information) and dynamic data gathered through API (mock) calls (inventory, fast moving information) into the local LLM.
 
 Operators interact via a browser dashboard; the LLM reasons over live inventory, bin locations, and safety constraints to propose validated bin moves.
 
-Designed for air-gapped, edge deployment on NUC-class hardware (8 GB RAM minimum). 
-No Docker, no cloud services, no external databases required.
+Designed for air-gapped, edge deployment on NUC-class hardware (8 GB RAM minimum). No Docker, no cloud services, no external databases required.
 
 ---
 
@@ -173,10 +172,10 @@ PYXIS-MCP/
                               ┌────────────────────────┴──────────────────┐
                               ▼                                            ▼
                ┌──────────────────────────┐            ┌──────────────────────────┐
-               │       pyxis_mock          │     OR     │      Oracle APEX          │
-               │     axum  :3030          │            │  REST API (remote)        │
-               │  (auto-starts when       │            │  set PYXIS_BASE_URL        │
-               │   PYXIS_BASE_URL absent)  │            └──────────────────────────┘
+               │       pyxis_mock         │     OR     │      Oracle              │
+               │     axum  :3030          │            │  REST API (remote)       │
+               │  (auto-starts when       │            │  set PYXIS_BASE_URL      │
+               │   PYXIS_BASE_URL absent) │            └──────────────────────────┘
                └──────────────────────────┘
 ```
 
@@ -266,7 +265,7 @@ MCP Client      mcp_server     pyxis_client / vector_search / safety_validation
                    v                                       v
       .--------------------------.           .---------------------------.
       |      VECTOR SEARCH       |           |      PYXIS_CLIENT (REST)  |
-      | (BGE-Small-en-v1.5)      |           |    (Oracle APEX / Mock)   |
+      | (BGE-Small-en-v1.5)      |           |    (Oracle      / Mock)   |
       '--------------------------'           '---------------------------'
                    |                                       |
                    |        .----------------------.       |
@@ -284,13 +283,13 @@ MCP Client      mcp_server     pyxis_client / vector_search / safety_validation
 
 ## Runtime Configuration
 
-| Env var | Default | Description |
-|---------|---------|-------------|
-| `PYXIS_BASE_URL` | *(absent)* | If absent, `pyxis_mock` auto-starts on :3030 |
-| `PYXIS_AUTH_TOKEN` | *(absent)* | Bearer token for live Oracle APEX only |
-| `MODEL_PATH` | `models/gemma.gguf` | Path to Gemma 4 GGUF (downloaded via GUI) |
+| Env var | Default | Description                                      |
+|---------|---------|--------------------------------------------------|
+| `PYXIS_BASE_URL` | *(absent)* | If absent, `pyxis_mock` auto-starts on :3030     |
+| `PYXIS_AUTH_TOKEN` | *(absent)* | Bearer token for live Oracle connection only     |
+| `MODEL_PATH` | `models/gemma.gguf` | Path to Gemma 4 GGUF (downloaded via GUI)        |
 | `ENGINE_PATH` | `engines/llama-server.exe` | Path to llama-server binary (downloaded via GUI) |
-| `OLLAMA_MODEL` | `gemma` | Model name passed to llama-server `--model` arg |
+| `OLLAMA_MODEL` | `gemma` | Model name passed to llama-server `--model` arg  |
 
 ### Startup sequence
 
@@ -315,7 +314,7 @@ cargo build --release
 # Run (mock mode — no env vars needed)
 cargo run --release
 
-# Run against live Oracle APEX
+# Run against live Oracle
 $env:PYXIS_BASE_URL = "https://pyxis.example.com/ords"
 $env:PYXIS_AUTH_TOKEN = "Bearer <token>"
 cargo run --release
