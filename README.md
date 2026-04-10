@@ -4,12 +4,11 @@ PYXIS-MCP is a nano, demo prototype for warehouse Digital Twin & Chatbot, built 
 
 It bridges a local LLM (Gemma 4 via llama-server) with a warehouse management system through the Model Context Protocol (MCP). 
 
-Data is sourced from both static data (like bins, SKU information) and dynamic data gathered through API (mock) calls (in
+Data is sourced from both static data (like bins, SKU information) and dynamic data gathered through API (mock) calls (inventory, fast moving information) into the local LLM.
 
 Operators interact via a browser dashboard; the LLM reasons over live inventory, bin locations, and safety constraints to propose validated bin moves.
 
-Designed for air-gapped, edge deployment on NUC-class hardware (8 GB RAM minimum). 
-No Docker, no cloud services, no external databases required.
+Designed for air-gapped, edge deployment on NUC-class hardware (8 GB RAM minimum). No Docker, no cloud services, no external databases required.
 
 ---
 
