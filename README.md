@@ -1,6 +1,7 @@
 # PYXIS-MCP
 
-PYXIS-MCP is a prototype Rust binary that creates a nano-sized logistics warehousing Digital Twin & Chatbot. 
+PYXIS-MCP is a nano, demo prototype for warehouse Digital Twin & Chatbot, built in rust.
+
 It bridges a local LLM (Gemma 4 via llama-server) with a warehouse management system through the Model Context Protocol (MCP). 
 Data is sourced from both static data (like bins, SKU information) and dynamic data gathered through API (mock) calls (inventory, fast moving information) into the local LLM.
 Operators interact via a browser dashboard; the LLM reasons over live inventory, bin locations, and safety constraints to propose validated bin moves.
@@ -8,6 +9,13 @@ Operators interact via a browser dashboard; the LLM reasons over live inventory,
 Designed for air-gapped, edge deployment on NUC-class hardware (8 GB RAM minimum). No Docker, no cloud services, no external databases required.
 
 ---
+
+<div align="center">
+  <img src="media/demo.gif" alt="PYXIS-MCP Demo" width="410" /><br>
+
+  <img src="media/digital_twin.png" alt="Digital Twin visualization" width="200" height="150" />
+  <img src="media/dynamic_inventory.png" alt="Dynamic Inventory dashboard" width="200" height="150" />
+</div>
 
 ## Tech Stack
 
@@ -238,6 +246,36 @@ MCP Client      mcp_server     pyxis_client / vector_search / safety_validation
      │  {staged:true}│                          │
      │◄──────────────│                          │
 ```
+
+---
+
+## Data Management
+
+       STATIC DATA (Ingest & Index)            DYNAMIC DATA (Real-time API)
+      Gathered at Startup/Background          Fetched per Tool Call (Live)
+     ________________________________        ________________________________
+    |                                |      |                                |
+    |  [ Bins ] -> A-1-1, B-2-5...   |      |  [ Inventory ] -> On-hand Qty  |
+    |  [ SKUs ] -> Weight, Zone      |      |  [ Orders ]    -> Demand/Open  |
+    |  [ User ] -> Certifications    |      |  [ Status ]    -> Occupied/Full|
+    |________________________________|      |________________________________|
+                   |                                       |
+                   v                                       v
+      .--------------------------.           .---------------------------.
+      |      VECTOR SEARCH       |           |      PYXIS_CLIENT (REST)  |
+      | (BGE-Small-en-v1.5)      |           |    (Oracle APEX / Mock)   |
+      '--------------------------'           '---------------------------'
+                   |                                       |
+                   |        .----------------------.       |
+                   |        |    CHATBOT ENGINE    |       |
+                   '------->|   (Gemma 4 ReAct)    |<------'
+                            '----------------------'
+                                       |
+                                       v
+                            .----------------------.
+                            |   VALIDATED ACTION   |
+                            |  (propose_move tool) |
+                            '----------------------'
 
 ---
 

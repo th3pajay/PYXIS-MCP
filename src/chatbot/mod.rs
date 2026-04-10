@@ -93,7 +93,14 @@ impl Chatbot {
                 .post(format!("{}/v1/chat/completions", self.base_url))
                 .json(&body)
                 .send().await
-                .map_err(|e| { eprintln!("[chatbot] send error: {e}"); e })?;
+                .map_err(|e| {
+                    eprintln!("[chatbot] send error: {e}");
+                    if e.is_connect() || e.is_request() {
+                        anyhow::anyhow!("LLM engine is unreachable at {}. It may have crashed — check engines/llama-server.log", self.base_url)
+                    } else {
+                        anyhow::anyhow!(e)
+                    }
+                })?;
 
             let status = http_resp.status();
             let raw_text = http_resp.text().await
